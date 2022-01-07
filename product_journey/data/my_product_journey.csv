@@ -1,0 +1,17 @@
+id,year,organization,product,description,type,client,link
+1,2008,Sanborn,3DWFT,A collection of commandline geospatial processing tools used for the creation of 3D smart city digital twin applications,Application,Sanborn,
+2,2009,Sanborn,Sanborn 3D Workflow,A streamlined workflow application for generating 3D smart city digital twin applications for use in Sanborn’s CityViz,Application,Sanborn,
+3,2009,Sanborn,CityViz,An application for performing scenario planning and visualizing 3D smart city digital twins,Application,Sanborn,
+4,2009,Sanborn,CityBuilder,An application for generating 3D smart city digital twin applications from a collection of geospatial data for use in Sanborn’s CityViz,Application,Sanborn,
+5,2010,Sanborn,TextureIt,An application for creating textured 3D building models for use in 3D smart city digital twin applications,Application,Sanborn,
+6,2010,Sanborn,Virtual New Delhi,"A 1,400 sqkm 3D smart city digital twin of the city of New Delhi India consisting of 3.5 million buildings and 350 geospatial layers for the 2010 Common Wealth Games",Digital Twin,City of New Delhi,
+7,2013,Lakehead University,Virtual Slate Island,A tourism 3D digital twin of an ecologically and culturally sensitive area within the newly created Lake Superior National Marine Conservation Area,Digital Twin,Parks Canada,
+8,2014,Sanborn,GeoVault,An application for creating textured 3D building models within SketchUp for use in 3D smart city digital twin applications,Extension,Sanborn,
+9,2014,Sanborn,Virtual QatarEnergy,"A 1,000 sqkm 3D smart city digital twin of QatarEngergy operational areas consisting of 250,000 textured buildings and 250 geospatial layers for improving planning and management",Digital Twin,QatarEnergy,
+10,2015,CherryPic,CherryPic,An Android mobile application allowing people to discover and sharing events and cool places within Hamilton Ontario Canada,Mobile App,Public,https://twitter.com/cherrypicapp
+11,2018,City of Toronto,Open Data Portal – Beta,The City of Toronto’s Open Data Portal is a mixed technology (open source and Esri) delivery tool to bring people and data together,SaaS,City of Toronto,
+12,2019,City of Toronto,Open Data Portal,The City of Toronto’s Open Data Portal is an open source delivery tool to bring people and data together,SaaS,City of Toronto,https://open.toronto.ca/
+13,2019,City of Toronto,CKAN QGIS Browser,A QGIS plugin that loads and displays data from CKAN enabled open data portals,Extension,City of Toronto,https://extensions.ckan.org/extension/qgis-ckan-browser/
+14,2019,City of Toronto,CKAN Google Sheets Add-on,A Google Sheets add-on that loads and displays data from CKAN enabled open data portals,Extension,City of Toronto,https://workspace.google.com/marketplace/app/ckan_sheets_addon/202800146287
+15,2019,City of Toronto,opendatatoronto R package,A R package that loads and displays data from the City of Toronto’s CKAN enabled open data portal,Extension,City of Toronto,https://cran.r-project.org/web/packages/opendatatoronto/index.html
+16,2020,GSTS,OCIANA,"A software as a service that rapidly processes satellite data with other data sets harvested from ocean, weather and port activity sources to provide decision-making information",SaaS,GSTS,https://gsts.ca/solutions/

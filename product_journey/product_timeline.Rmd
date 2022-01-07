@@ -1,0 +1,321 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+library(ggwaffle)
+library(waffle)
+```
+
+```{r}
+df <- readr::read_csv("~/Github/product_journey/data/my_product_journey.csv") %>%
+  dplyr::mutate(temp = 0)
+df
+```
+
+
+```{r}
+# Custom colours
+drsimonj_colors <- c(
+  `lite green` = "#9FC2B9",
+  `mid green` = "#1E6E6E",
+  `dark green` = "#153331",
+  `orange` = "#E74F2C",
+  `red` = "#A62014")
+
+
+drsimonj_cols <- function(...) {
+  cols <- c(...)
+
+  if (is.null(cols))
+    return (drsimonj_colors)
+
+  drsimonj_colors[cols]
+}
+
+
+drsimonj_palettes <- list(
+  `main`  = drsimonj_cols("lite green", "mid green", "dark green", "orange", "red"))
+
+
+drsimonj_pal <- function(palette = "main", reverse = FALSE, ...) {
+  pal <- drsimonj_palettes[[palette]]
+
+  if (reverse) pal <- rev(pal)
+
+  colorRampPalette(pal, ...)
+}
+
+
+scale_color_drsimonj <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- drsimonj_pal(palette = palette, reverse = reverse)
+
+  if (discrete) {
+    discrete_scale("colour", paste0("drsimonj_", palette), palette = pal, ...)
+  } else {
+    scale_color_gradientn(colours = pal(256), ...)
+  }
+}
+
+
+scale_fill_drsimonj <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- drsimonj_pal(palette = palette, reverse = reverse)
+
+  if (discrete) {
+    discrete_scale("fill", paste0("drsimonj_", palette), palette = pal, ...)
+  } else {
+    scale_fill_gradientn(colours = pal(256), ...)
+  }
+}
+```
+
+
+```{r}
+df %>%
+  ggplot() +
+  aes(x = year) +
+  geom_histogram(bins = 30L, fill = "#153331") +
+  theme_minimal() +
+  scale_y_continuous(breaks = scales::pretty_breaks())
+```
+
+```{r}
+df %>%
+  ggplot() +
+  aes(x = year, y = temp, shape = group) +
+  geom_point(position = position_jitter(w = 1, h = 0.01), size = 3) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title.y = element_blank()) +
+  labs(x = "Product Release Year") +
+  scale_x_continuous(breaks = scales::pretty_breaks())
+
+
+df %>%
+  ggplot() +
+  aes(x = year, y = temp, colour = group) +
+  geom_point(position = position_jitter(w = 1, h = 0.01), size = 3) +
+  scale_color_drsimonj() +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title.y = element_blank()) +
+  labs(x = "Product Release Year") +
+  scale_x_continuous(breaks = scales::pretty_breaks())
+
+
+df %>%
+  ggplot() +
+  aes(x = year, fill = group) +
+  geom_histogram(bins = 30L) +
+  scale_fill_drsimonj() +
+  theme_minimal() +
+  labs(x = "Product Release Year",
+       y = "Number of Products") +
+  theme(legend.position = "bottom",
+        legend.title=element_blank())
+```
+
+
+```{r}
+df %>%
+  ggplot() +
+  aes(x = year, y = temp, colour = group, label = organization, label2 = product, label3 = description, label4 = link) +
+  geom_point(position = position_jitter(w = 1, h = 0.01), size = 3) +
+  coord_fixed(ratio = 160) +
+  scale_color_drsimonj() +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title.y = element_blank()) +
+  labs(x = "Product Release Year") +
+  scale_x_continuous(breaks = scales::pretty_breaks())
+```
+
+
+
+```{r}
+p1 <- df %>%
+  ggplot() +
+  aes(x = year, y = temp, colour = type, label = organization, label2 = product, label3 = description) +
+  geom_point(position = position_jitter(w = 1, h = 0.01), size = 3) +
+  scale_color_drsimonj() +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(x = "Product Release Year") +
+  scale_x_continuous(breaks = scales::pretty_breaks())
+
+plotly::ggplotly(p1,
+                 width = 1000,
+                 heigh = 300,
+                 tooltip = c("year", "organization", "product", "description"))
+```
+
+
+```{r}
+p2 <- df %>%
+  ggplot() +
+  aes(x = year, y = temp, label = organization, label2 = product, label3 = type) +
+  geom_point(position = position_jitter(w = 1, h = 0.01), size = 3, colour = "#153331") +
+  scale_color_drsimonj() +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(x = "Product Release Year") +
+  scale_x_continuous(breaks = scales::pretty_breaks())
+
+plotly::ggplotly(p2,
+                 width = 1000,
+                 heigh = 300,
+                 tooltip = c("year", "organization", "product", "type"))
+```
+
+
+```{r}
+# Vector
+x <- c(G1 = 30, G2 = 25, G3 = 20, G4 = 5)
+
+# Waffle chart
+waffle(x, rows = 8)
+```
+
+
+
+
+
+```{r}
+df %>%
+  dplyr::group_by(type) %>%
+  dplyr::tally() %>%
+  dplyr::ungroup()
+
+# Vector
+a <- c(Application = 5, `Digital Twin` = 3, Extension = 4, `Mobile App` = 1, SaaS = 3)
+
+# Waffle chart
+waffle(a, rows = 4)
+```
+
+
+```{r}
+ggplot(df, aes(fill = group, values = value)) +
+  geom_waffle(n_rows = 8, size = 0.33, colour = "white") +
+  scale_fill_manual(name = NULL,
+                    values = c("#BA182A", "#FF8288", "#FFDBDD"),
+                    labels = c("A", "B", "C")) +
+  coord_equal() +
+  theme_void()
+```
+
+
+```{r}
+df %>%
+  dplyr::group_by(type) %>%
+  dplyr::tally() %>%
+  dplyr::ungroup() %>%
+  ggplot2::ggplot() +
+   aes(x = 2, y = n, fill = type) +
+   geom_bar(stat = "identity") +
+   coord_polar("y", start = 200) +
+   theme_void() +
+   theme(legend.position = "bottom",
+         legend.title = element_blank()) +
+   scale_fill_drsimonj() +
+   xlim(0.7, 2.5)
+```
+
+```{r}
+ggplot(data = rdown.os, 
+       aes(x = 2, y = percentage, fill = os))+
+  geom_bar(stat = "identity")+
+  coord_polar("y", start = 200) +
+  geom_text(aes(y = lab.pos, label = paste(percentage,"%", sep = "")), col = "white") +
+  theme_void() +
+  scale_fill_brewer(palette = "Dark2")+
+  xlim(.2,2.5)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
