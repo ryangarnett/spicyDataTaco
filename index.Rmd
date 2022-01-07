@@ -1,0 +1,180 @@
+---
+title: "My Product Journey"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+---
+
+<style>                     
+.navbar {
+  background-color:#153331;
+  border-color:#ffffff;
+}
+.navbar-brand {
+color:#ffffff;
+}
+</style>  
+
+
+```{css, echo=FALSE}
+.fluid-row {
+  font-size: 5.9vw;
+}
+```
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(treemapify)
+library(grid)
+library(DT)
+
+df <- readr::read_csv("~/Github/spicyDataTaco/data/my_product_journey.csv") %>%
+  dplyr::mutate(temp = 0)
+
+# Custom colours
+drsimonj_colors <- c(
+  `lite green` = "#9FC2B9",
+  `mid green` = "#1E6E6E",
+  `dark green` = "#153331",
+  `orange` = "#E74F2C",
+  `red` = "#A62014")
+
+
+drsimonj_cols <- function(...) {
+  cols <- c(...)
+
+  if (is.null(cols))
+    return (drsimonj_colors)
+
+  drsimonj_colors[cols]
+}
+
+
+drsimonj_palettes <- list(
+  `main`  = drsimonj_cols("lite green", "mid green", "dark green", "orange", "red"))
+
+
+drsimonj_pal <- function(palette = "main", reverse = FALSE, ...) {
+  pal <- drsimonj_palettes[[palette]]
+
+  if (reverse) pal <- rev(pal)
+
+  colorRampPalette(pal, ...)
+}
+
+
+scale_color_drsimonj <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- drsimonj_pal(palette = palette, reverse = reverse)
+
+  if (discrete) {
+    discrete_scale("colour", paste0("drsimonj_", palette), palette = pal, ...)
+  } else {
+    scale_color_gradientn(colours = pal(256), ...)
+  }
+}
+
+
+scale_fill_drsimonj <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- drsimonj_pal(palette = palette, reverse = reverse)
+
+  if (discrete) {
+    discrete_scale("fill", paste0("drsimonj_", palette), palette = pal, ...)
+  } else {
+    scale_fill_gradientn(colours = pal(256), ...)
+  }
+}
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### Products Released
+
+```{r, fig.width=2}
+valueBox(as.numeric(dplyr::count(df)), icon = "fa-box-open", color = "#1E6E6E")
+```
+
+### Production Releases
+
+Throughout my career I have been involved in the design, development, and release of `r as.numeric(dplyr::count(df))` production level products at various organizations. A mixture of different digital products have been released over a `r max(df$year) - min(df$year)` year period; from the `r as.numeric(dplyr::count(dplyr::filter(df, client == "Sanborn")))` products developed to improve service delivery and open new business opportunities, to the `r as.numeric(dplyr::count(dplyr::filter(df, client != "Sanborn")))` client facing deliverables.
+
+
+Row
+-----------------------------------------------------------------------
+
+### Products Released
+
+**City of Toronto**
+
+The City of Toronto’s Open Data Portal is an open source delivery tool to bring people and data together. Whether you’re an app developer, an engaged citizen, or a student trying to learn more about how the city works, the Open Data Portal contains a wealth of datasets for you to explore. [Open Data Portal](https://open.toronto.ca/)
+
+A data access extension for the most popular open source GIS application, QGIS. The CKAN QGIS Browser provides access to CKAN open source content management solution, improving access to open data for users performing location analytics within QGIS. [CKAN QGIS Browser](https://medium.com/@ryan.garnett/towards-location-intelligence-open-data-and-the-qgis-ckan-browser-plugin-72883035009)
+
+The CKAN data explorer allows users to access open data that is managed within the CKAN open source content management solution. The plugin will allow a wider range of users to access the most current version of available open data. [CKAN Google Sheets Add-on](https://medium.com/@ryan.garnett/towards-data-analytics-open-data-and-the-ckan-google-sheets-add-on-3d9010a2102e)
+
+opendatatoronto is an R interface to the City of Toronto Open Data Portal. The goal of the package is to help read data directly into R without needing to manually download it via the portal. [opendatatoronto R package](https://cran.r-project.org/web/packages/opendatatoronto/opendatatoronto.pdf)
+
+
+### **Product Owner**
+
+```{r, fig.width=8, fig.height=6, fig.fullwidth=TRUE}
+df %>%
+  dplyr::group_by(organization, type) %>%
+  dplyr::tally() %>%
+  dplyr::ungroup() %>%
+  ggplot() +
+   aes(area = n, fill = type, label = type, subgroup = organization) +
+   geom_treemap() +
+   geom_treemap_text(colour = "#ffffff",
+                    place = "topleft",
+                    size = 12,
+                    padding.x = grid::unit(2.5, "mm"),
+                    padding.y = grid::unit(2.5, "mm")) +
+   geom_treemap_subgroup_border(colour = "#ffffff",
+                                size = 3) +
+   geom_treemap_subgroup_text(place = "center",
+                              grow = FALSE,
+                              alpha = 0.82,
+                              colour = "#121212",
+                              fontface = "italic",
+                              reflow = TRUE,
+                              padding.x = grid::unit(4.75, "mm")) +
+   scale_fill_drsimonj() +
+   theme(legend.position = "bottom",
+         legend.title = element_blank(),
+         legend.text = element_text(size = 14))
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### **Product Release Timeline**
+
+```{r, fig.width=20, fig.fullwidth=TRUE}
+df %>%
+  ggplot() +
+    aes(x = year, fill = organization) +
+    geom_histogram(bins = 30L) +
+    scale_fill_drsimonj() +
+    labs(x = "Product Release Year",
+         y = "Number of Products") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.text = element_text(size = 12),
+          axis.title.x = element_text(size = 14L),
+          axis.title.y = element_text(size = 14L),
+          axis.text.x = element_text(size = 11),
+          axis.text.y = element_text(size = 11),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(linetype = 3, size = 0.3, color = "#484848"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank()) +
+    scale_x_continuous(breaks = scales::pretty_breaks())
+```
